@@ -1,0 +1,14 @@
+create table Books (
+    id int primary key,
+    Title varchar(100),
+    Author varchar(20),
+    Category varchar(20),
+    Available varchar(5) default="Yes"
+)
+
+create table Users (
+    Memebership_id int primary key,
+    username varchar(20),
+    password  varchar(20),
+    role varchar(10) default="user"
+)
