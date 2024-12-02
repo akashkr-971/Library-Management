@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library User Registration</title>
+    <title>Library User Login</title>
     <style>
         body {
-            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-family: Arial, sans-serif;
             background-color: rgb(31, 49, 20);
             display: flex;
             justify-content: center;
@@ -15,15 +15,15 @@
             height: 100vh;
             margin: 0;
         }
-        .registration-form {
+        .login-form {
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 400px;
-            margin-top:50px;
+            margin-top: 50px;
         }
-        .registration-form h2 {
+        .login-form h2 {
             text-align: center;
             margin-bottom: 20px;
         }
@@ -92,58 +92,64 @@
 
 <body>
     <nav>
-    <a href="Books.php"><h1>Library Management System</h1></a>
+        <h1>Library Management System</h1>
     </nav>
-    <div class="registration-form">
-        <h2>User Registration</h2>
+    <div class="login-form">
+        <h2>User Login</h2>
         <form action=" " method="POST">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
-                <label for="email">Member Ship ID:</label>
-                <input type="text" id="membership" name="membership" required>
-            </div>
-            <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="form-button">
-                <input type="submit" value="Register" name="register-button">
-            </div>
-            <div class="form-button">
-                <a href="Books.php">Return Home</a>
+                <input type="submit" name="login-button" value="Login">
             </div>
         </form>
     </div>
 </body>
 <?php
-
+    session_start();
     $con = mysqli_connect("localhost","root","","library");
     if(!$con)
         die("Connection Failed ".mysqli_connect_error());
         
-    if(isset($_POST['register-button']))
+    if(isset($_POST['login-button']))
     {
         $uname = $_POST['username'];
-        $membership = $_POST['membership'];
-        $password = $_POST['password'];
-        $sql="insert into users (membership_id, username, password) values ('$membership','$uname','$password')";
+        $upass = $_POST['password'];
+        $sql = "SELECT * FROM Users WHERE  username='$uname' ";
         try{
-            if (mysqli_query($con,$sql)){
-                header("Location: books.php");
+            $result = mysqli_query($con, $sql);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                if ($upass == $row['password'] ) {
+                    $_SESSION['user_id'] = $row['Membership_id'];
+                    $_SESSION['username'] = $row['username'];
+                    $_SESSION['role'] = $row['role'];
+                    echo "<script>console.log('Session Username: " . $_SESSION['username'] . "');</script>";
+                    echo "<script>console.log('Session User ID: " . $_SESSION['user_id'] . "');</script>";
+                    if($row['role'] == 'admin')
+                        header("Location: books.php");
+                    else
+                        header("Location: student.php");
+                }
+                else{
+                    echo "<script>alert('Invalid password!'); window.location.href='login.php';</script>";
+                }
+                
+            } else {
+                echo "<script>alert('No user found with that username!'); window.location.href='login.php';</script>";
             }
-            else{
-                echo "<br>Insertion Failed!!!";
-            }
-        }
-        catch(Exception $e)
-        {
-        echo $e;
+        } catch (Exception $e) {
+            echo $e;
         }
     }
     mysqli_close($con);
 
 ?>
+
 </html>

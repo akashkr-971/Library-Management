@@ -17,12 +17,6 @@
             height: 95vh;
 
         }
-        nav{
-            display:flex;
-            position:absolute;
-            top:0;
-            justify-content:space-evenly;
-        }
 
         form {
             border: 10px solid red;
@@ -48,9 +42,6 @@
             padding: 5px;
             margin-bottom: 5px;
         }
-        .displaybooks{
-            margin-top: 20px;
-        }
         input[type='search']{
             width: 75%;
             padding: 5px;
@@ -72,52 +63,35 @@
             background-color: rgb(36, 242, 132);
             color: black;
         }
+        .bookinsertform{
+            margin-top:100px;
+        }
+        a{
+            text-decoration: none;
+            color:black;
+        }
     </style>
 </head>
 
 <?php
-    $con = mysqli_connect("localhost", "root", "", "library");
-    if (!$con) {
-        die("Connection Failed: " . mysqli_connect_error());
-    }
-
-    $fullresult = null;
-    if (!isset($_POST['searchbook'])) {
-        $sql = "SELECT * FROM books";
-        try {
-            $fullresult = mysqli_query($con, $sql);
-        } catch (Exception $e) {
-            echo $e;
-        }
-    }
-
-    if (isset($_POST['searchbook'])) {
-        $bookdetail = trim($_POST['bookdetail']);
-
-        $sql = "SELECT * FROM books 
-                WHERE ID = '$bookdetail' 
-                OR LOWER(Title) LIKE LOWER('%$bookdetail%') 
-                OR LOWER(Author) LIKE LOWER('%$bookdetail%') 
-                OR LOWER(Category) LIKE LOWER('%$bookdetail%')
-                OR LOWER(Available) LIKE LOWER('%$bookdetail%')";
-
-        try {
-            $result = mysqli_query($con, $sql);
-        } catch (Exception $e) {
-            echo $e;
-        }
+    session_start();
+    echo "<script>console.log('Session Username: " . $_SESSION['username'] . "');</script>";
+    echo "<script>console.log('Session User ID: " . $_SESSION['user_id'] . "');</script>";
+    if(!isset($_SESSION['username'])){
+        header("Location:login.php");
     }
 ?>
 
 <body>
     <nav>
-        <h1>Library Management System</h1>
+        <a href="Books.php"><h1>Library Management System</h1></a>
         <a href="Registeruser.php"><h4>Register User</h4></a>
-        <a href="Report.php"><h4>Library Report</h4></a>
-        <h1>Logout</h1>
+        <a href="Insertedbook.php"><h4>Inserted Books</h4></a>
+        <a href="logout.php"><h1>Logout</h1></a>
     </nav>
     <div>
-        <form method='POST' action=' '>
+        <br><br><br><h1>Welcome <?php  echo $_SESSION['username'] ?></h1>
+        <form method='POST' action=' ' class="bookinsertform">
             <table>
                 <tr>
                     <td colspan="4" align="center">Book Section</th>
@@ -168,56 +142,6 @@
                         <input type="submit" name="delete" value="DELETE">
                     </td>
                 </tr>
-            </table>
-        </form>
-    </div>
-    <div class="displaybooks">
-        <form action="" method="post">
-            <input type="search" name="bookdetail" placeholder="Enter the detail of book to search">
-            <input type="submit" name="searchbook" value="Search Book">
-            <table border="1" class="displaytable">
-                <thead>
-                    <th>Book ID</th>
-                    <th>Book Name</th>
-                    <th>Book Author</th>
-                    <th>Book Category</th>
-                    <th>Book Availability</th>
-                </thead>
-                <tbody>
-                    <tbody>
-                        <?php
-                            if (isset($_POST['searchbook'])) {
-                                if ($result && mysqli_num_rows($result) > 0) {
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        echo "<tr>";
-                                        echo "<td>" . htmlspecialchars($row['ID']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Title']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Author']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Category']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Available']) . "</td>";
-                                        echo "</tr>";
-                                    }
-                                } else {
-                                    echo "<tr><td colspan='5'>No results found.</td></tr>";
-                                }
-                            } else {
-                                if ($fullresult && mysqli_num_rows($fullresult) > 0) {
-                                    while ($row = mysqli_fetch_assoc($fullresult)) {
-                                        echo "<tr>";
-                                        echo "<td>" . htmlspecialchars($row['ID']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Title']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Author']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Category']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($row['Available']) . "</td>";
-                                        echo "</tr>";
-                                    }
-                                } else {
-                                    echo "<tr><td colspan='5'>No books available.</td></tr>";
-                                }
-                            }
-                        ?>
-
-                </tbody>
             </table>
         </form>
     </div>

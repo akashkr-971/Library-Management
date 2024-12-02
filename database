@@ -12,3 +12,55 @@ create table Users (
     password  varchar(20),
     role varchar(10) default="user"
 )
+
+CREATE TABLE `library`.`bookings` (`Booking_id` INT(5) NOT NULL , `Book_id` INT(5) NOT NULL , `BBook_name` VARCHAR(50) NOT NULL , `Take_date` DATE NOT NULL , `Return_date` DATE NOT NULL , `Status` VARCHAR(50) NOT NULL DEFAULT 'Pending' , PRIMARY KEY (`Booking_id`)) ENGINE = InnoDB;
+
+
+PHP EXPORT SCRIPT
+
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+CREATE TABLE `bookings` (
+  `Booking_id` int(5) NOT NULL,
+  `Book_id` int(5) NOT NULL,
+  `Book_name` varchar(50) NOT NULL,
+  `Take_date` date NOT NULL,
+  `Return_date` date NOT NULL,
+  `Status` varchar(50) NOT NULL DEFAULT 'Pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `books` (
+  `ID` int(5) NOT NULL,
+  `Title` varchar(80) NOT NULL,
+  `Author` varchar(50) NOT NULL,
+  `Category` varchar(15) NOT NULL,
+  `Available` varchar(5) NOT NULL DEFAULT 'Yes'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `books` (`ID`, `Title`, `Author`, `Category`, `Available`) VALUES
+(1, 'A Mere Interlude', 'Thomas Hardy', 'Romance', 'Yes'),
+(2, 'An Occurrence at Owl Creek Bridge One of the Missing', 'Ambrose Bierce', 'Adventure', 'Yes');
+
+CREATE TABLE `users` (
+  `Membership_id` int(11) NOT NULL,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(20) NOT NULL,
+  `role` varchar(10) NOT NULL DEFAULT 'user'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `users` (`Membership_id`, `username`, `password`, `role`) VALUES
+(1, 'Akash', 'akash', 'user'),
+(2, 'admin', 'admin', 'admin');
+
+ALTER TABLE `bookings`
+  ADD PRIMARY KEY (`Booking_id`);
+
+ALTER TABLE `books`
+  ADD PRIMARY KEY (`ID`);
+
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`Membership_id`);
+COMMIT;

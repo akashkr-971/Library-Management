@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            display: flex;
+            height: 96vh;
+            width: 100vh;
+        }
+        .bookingform{
+            display: flex;
+            position: inherit;
+            top: 0;
+            left: 0;
+            transform: translate(50%,50%);
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="bookingform">
+        <h4 style="text-align: center;">Booking Form</h4>
+        <form action="" method="post">
+            <table width="100%">
+                <tr>
+                    <td>Book ID</td>
+                    <td><label id='bookid'>0</label></td>
+                </tr>
+                <tr>
+                    <td>Book Name</td>
+                    <td><label id='bname'>0</label></td>
+                </tr>
+                <tr>
+                    <td>Date</td>
+                    <td><label id='bdate'>0</label></td>
+                </tr>
+                <tr>
+                    <td>Return Date</td>
+                    <td><label id='rdate'>0</label></td>
+                </tr>
+                <tr>
+                    <td class="buttons">
+                        <button onclick="closeform()">Cancel</button>
+                        <input type="submit" name="Take" value="Take">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+</html>
