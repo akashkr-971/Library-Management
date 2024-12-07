@@ -80,6 +80,13 @@
     if(!isset($_SESSION['username'])){
         header("Location:login.php");
     }
+    $con = mysqli_connect("localhost","root","","library");
+    $sql1="SELECT MAX(id) FROM books";
+    $lastbookid = mysqli_query($con, $sql1);
+    $row = mysqli_fetch_assoc($lastbookid);
+    $lastbookidno = $row['id'];
+    echo "<script>console.log($lastbookidno)</script>";
+    mysqli_close($con);
 ?>
 
 <body>
@@ -87,10 +94,10 @@
         <a href="Books.php"><h1>Library Management System</h1></a>
         <a href="Registeruser.php"><h4>Register User</h4></a>
         <a href="Insertedbook.php"><h4>Inserted Books</h4></a>
+        <a href="adminbooking.php"><h4>Bookings</h4></a>
         <a href="logout.php"><h1>Logout</h1></a>
     </nav>
     <div>
-        <br><br><br><h1>Welcome <?php  echo $_SESSION['username'] ?></h1>
         <form method='POST' action=' ' class="bookinsertform">
             <table>
                 <tr>
@@ -160,12 +167,7 @@ if(isset($_POST['insert']))
         die("Connection Failed ".mysqli_connect_error());
     $sql="insert into books (ID, Title, Author, Category) values ('$bid','$bname','$aname','$category')";
     try{
-        if (mysqli_query($con,$sql)){
-            echo "<br><br><br>Inserted Successfully!!!";
-        }
-        else{
-            echo "<br>Insertion Failed!!!";
-        }
+        mysqli_query($con,$sql);
     }
     catch(Exception $e)
     {

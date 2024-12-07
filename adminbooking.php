@@ -42,7 +42,7 @@
         }
 
         .displaybookings {
-            margin-top: 30px;
+            margin-top: 80px;
             width: 80%;
             max-width: 1000px;
             background-color: rgb(52, 73, 94);
@@ -68,12 +68,7 @@
             color: #333;
         }
 
-        .searchbooking{
-            width:20% !important;
-        }
-
-        input[type="submit"] {
-            width: 150px;
+        input[type="submit"] ,input[type="button"]{
             padding: 10px;
             font-size: 16px;
             border-radius: 5px;
@@ -148,45 +143,42 @@
         die("Connection Failed: " . mysqli_connect_error());
     }
 
-    $user_id = $_SESSION['user_id'];
     $bookings_result = null;
-    echo "<script>console.log('The id is $user_id')</script>";
     if (isset($_POST['searchbooking'])) {
         $booking_detail = trim($_POST['bookingdetail']);
-        $sql = "SELECT * FROM bookings 
-                WHERE user_id = '$user_id'
-                AND (Booking_id LIKE '%$booking_detail%' 
-                OR Book_id LIKE '%$booking_detail%' 
-                OR Take_date LIKE '%$booking_detail%')";
+        $sql = "SELECT * FROM bookings  WHERE user_id = '$user_id' AND (Booking_id LIKE '%$booking_detail%' OR Book_id LIKE '%$booking_detail%' OR Take_date LIKE '%$booking_detail%')";
     } else {
-        $sql = "SELECT * FROM bookings WHERE user_id = '$user_id'";
+        $sql = "SELECT * FROM bookings";
     }
-
     try {
         $bookings_result = mysqli_query($con, $sql);
     } catch (Exception $e) {
         echo $e;
     }
 
-    if (isset($_POST['returnbook'])) {
+    if (isset($_POST['acceptbookbutton'])) {
         $bookngid = $_POST['bkngid'];
         echo "<script>console.log('$bookngid')</script>";
-        $sql = "UPDATE bookings SET Status = 'Returned' WHERE Booking_id = '$bookngid'";
+        $sql = "UPDATE bookings SET Status = 'Accepted' WHERE Booking_id = '$bookngid'";
         mysqli_query($con, $sql);
-        header("Location: Bookings.php");
+        header("Location: adminbooking.php");
     }
-    if (isset($_POST['cancel'])) {
-        $bookngid = $_POST['bkngid'];
+    if (isset($_POST['returnedbook'])) {
+        $bookngid = $_POST['bkngid']; 
+        $bkid = $_POST['bkid']; 
         echo "<script>console.log('$bookngid')</script>";
-        $sql = "UPDATE bookings SET Status = 'Cancelled' WHERE Booking_id = '$bookngid'";
+        $sql = "UPDATE bookings SET Status = 'Completed' WHERE Booking_id = '$bookngid'";
+        $sql1 = "UPDATE books SET Available='Yes' WHERE id='$bkid'; ";
         mysqli_query($con, $sql);
-        header("Location: Bookings.php");
+        mysqli_query($con, $sql1);
+        header("Location: adminbooking.php");
     }
+    
 ?>
 
 <body>
     <nav>
-        <a href="student.php"><h1>Library Management System</h1></a>
+        <a href="Books.php"><h1>Library Management System</h1></a>
         <a href="logout.php"><h1>Logout</h1></a>
     </nav>
 
@@ -201,7 +193,6 @@
                 <tr>
                     <th>Booking ID</th>
                     <th>Book ID</th>
-                    <th>Book Name</th>
                     <th>Booking Date</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -214,18 +205,18 @@
                             echo "<tr>";
                             echo "<td>" .$row['Booking_id'] . "</td>";
                             echo "<td>" .$row['Book_id'] . "</td>";
-                            echo "<td>" .$row['Book_id'] . "</td>";
                             echo "<td>" .$row['Take_date'] . "</td>";
                             echo "<td>" .$row['Status'] . "</td>";
                             echo "<form action='' method='post'>";
                             echo "<input type='hidden' name='bkngid' value='" . $row['Booking_id'] . "'>";
+                            echo "<input type='hidden' name='bkid' value='" . $row['Book_id'] . "'>";
                             
                             if ($row['Status'] == "Pending") {
-                                echo "<td><input type='submit' name='cancel' value='Cancel'></td>";
+                                echo "<td><input type='submit' name='acceptbookbutton' value='Accept'></td>";
                             } elseif ($row['Status'] == "Accepted") {
-                                echo "<td><input type='submit' name='returnbook' value='Return Book'></td>";
+                                echo "<td><Label>Accepted</Label></td>";
                             }elseif ($row['Status'] == "Returned") {
-                                echo "<td><Label>Return request send</Label></td>";
+                                echo "<td><input type='submit' name='returnedbook' value='Returned Book'></td>";
                             }elseif ($row['Status'] == "Cancelled") {
                                 echo "<td><Label>Cancelled</Label></td>";
                             }else {
@@ -235,7 +226,7 @@
                             echo "</form>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No bookings found.</td></tr>";
+                        echo "<tr><td colspan='4'>No bookings found.</td></tr>";
                     }
                 ?>
             </tbody>

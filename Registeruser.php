@@ -93,6 +93,7 @@
 <body>
     <nav>
     <a href="Books.php"><h1>Library Management System</h1></a>
+    <a href="logout.php"><h1>Logout</h1></a>
     </nav>
     <div class="registration-form">
         <h2>User Registration</h2>
@@ -100,10 +101,6 @@
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Member Ship ID:</label>
-                <input type="text" id="membership" name="membership" required>
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
@@ -127,9 +124,8 @@
     if(isset($_POST['register-button']))
     {
         $uname = $_POST['username'];
-        $membership = $_POST['membership'];
         $password = $_POST['password'];
-        $sql="insert into users (membership_id, username, password) values ('$membership','$uname','$password')";
+        $sql="insert into users (username, password) values ('$uname','$password')";
         try{
             if (mysqli_query($con,$sql)){
                 header("Location: books.php");

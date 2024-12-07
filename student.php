@@ -24,10 +24,18 @@
             width: 100%;
             background-color: rgb(36, 242, 132);
             color: black;
+            margin-bottom : 20px;
         }
         .displaybooks{
-            margin-top: 20px;
-            overflow: scroll;
+            margin-top:80px;
+            width: 80%;
+            max-width: 1000px;
+            background-color: rgb(52, 73, 94);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: auto;
+            max-height:500px;
         }
         .displaybooks::-webkit-scrollbar {
             width: 0px;
@@ -52,7 +60,7 @@
             margin-bottom: 5px;
         }
         input[type='submit']{
-            width: 24%;
+            width: 23%;
             padding: 5px;
             margin-bottom: 5px;
         }
@@ -66,19 +74,45 @@
             text-decoration: none;
             color:black;
         }
+        table{
+            width:100%;
+        }
         .action{
             width:100% !important;
         }
-        td{
-            text-align:center;
-            width:20%;
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: rgb(36, 242, 132);
+            color: black;
+        }
+
+        td {
+            background-color: #f8f9fa;
+            color: black;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f1f1f1;
+        }
+
+        tr:nth-child(odd) td {
+            background-color: #ffffff;
         }
         #bookingform{
             display: flex;
             position:relative;
-            transform: translate(0%,-50%);
+            transform: translate(0%,10%);
             background-color:green;
-            height: 300px;
+            height: 400px;
             width: 500px;
             flex-direction: column;
             padding: 10px;
@@ -98,7 +132,7 @@
         button ,.takebutton{
             padding: 8px 16px;
             border: none;
-            background-color: white;
+            background-color: #FFFF00;
             color: green;
             border-radius: 8px;
             cursor: pointer;
@@ -157,6 +191,43 @@
             echo $e;
         }
     }
+    if (isset($_POST['Take'])) {
+        $user_id = $_SESSION['user_id'];
+        $book_id = trim($_POST['bookid']);
+        $book_name = trim($_POST['bname']);
+        $take_date = trim($_POST['takeDate']);
+        $ret_date = trim($_POST['retdate']);
+        
+        if (empty($take_date)) {
+            echo "<script>alert('Please select a take date.'); window.history.back();</script>";
+            exit;
+        }
+        if (empty($ret_date)) {
+            echo "<script>alert('Please reselect the take date.'); window.history.back();</script>";
+            exit;
+        }
+        $sql = "INSERT INTO bookings(user_id,Book_id, Book_name, Take_date, Return_date, Status) 
+                VALUES ('$user_id','$book_id', '$book_name', '$take_date', '$ret_date', 'Pending')";
+        $sql1 = "UPDATE BOOKS SET AVAILABLE = 'No' WHERE id = '$book_id'; ";
+    
+        if (mysqli_query($con, $sql)) {
+            if(mysqli_query($con, $sql1)){
+                echo "<script>
+                    alert('Book taking request sent');
+                    window.history.back();
+                    document.getElementById('takeDate').value = ''; 
+                </script>";
+            exit;
+            }
+            else{
+                echo "<script>alert('Update error: " . mysqli_error($con) . "'); window.history.back();</script>";
+            }
+        } else {
+            echo "<script>alert('Error: " . mysqli_error($con) . "'); window.history.back();</script>";
+            exit;
+        }
+        
+    }
 ?>
 <body>
     <div id="overlay" style="display:none"></div>
@@ -165,7 +236,7 @@
         <a href="Bookings.php"><h4>Manage Bookings</h4></a>
         <a href="logout.php"><h1>Logout</h1></a>
     </nav>
-    <div class="displaybooks">
+    <div class="displaybooks" id="displaybooks">
         <form class="bookdetails" action="" method="post">
             <input class="search" type="search" name="bookdetail" placeholder="Enter the detail of book to search">
             <input type="submit" name="searchbook" value="Search Book">
@@ -190,7 +261,10 @@
                                         echo "<td>" . $row['Author'] . "</td>";
                                         echo "<td>" . $row['Category'] . "</td>";
                                         echo "<td>" . $row['Available'] . "</td>";
-                                        echo "<td><button type='button' onclick='bookingform(" . $row['ID'] . ", \"" .$row['Title'] . "\")'>Take Book</button></td>";
+                                        if($row['Available'] == "Yes"){
+                                            echo "<td><button type='button' onclick='bookingform(" . $row['ID'] . ", \"" .$row['Title'] . "\")'>Take Book</button></td>";
+                                        }else   
+                                            echo "<td>Book already Taken</td>";
                                         echo "</tr>";
                                     }
                                 } else {
@@ -208,7 +282,7 @@
                                         if($row['Available'] == "Yes")
                                             echo "<td><button type='button' onclick='bookingform(" . $row['ID'] . ", \"" .$row['Title'] . "\")'>Take Book</button></td>";
                                         else   
-                                            echo "Book not available";
+                                            echo "<td>Book not available</td>";
                                         echo "</tr>";
                                     }
                                 } else {
@@ -246,10 +320,12 @@
             console.log(now);
             const mindate = now.toISOString().split('T')[0];
             datetime.setAttribute('min',mindate);
+            datetime.value="";
         });
         function bookingform(bid,title){
             document.getElementById('overlay').style.display='flex';
             document.getElementById('bookingform').style.display='flex';
+            document.getElementById('displaybooks').style.display='none';
             bookid = document.getElementById('bookid');
             bookname = document.getElementById('bname');
             bookid.value=bid;
@@ -266,36 +342,8 @@
         function closeform(){
             document.getElementById('overlay').style.display='none';
             document.getElementById('bookingform').style.display='none';
+            document.getElementById('displaybooks').style.display='';
         }
     </script>
 </body>
-<?php
-$con = mysqli_connect("localhost", "root", "", "library");
-if (!$con) {
-    die("Connection Failed: " . mysqli_connect_error());
-}
-
-if (isset($_POST['Take'])) {
-    $book_id = trim($_POST['bookid']);
-    $book_name = trim($_POST['bname']);
-    $take_date = trim($_POST['takeDate']);
-    $ret_date = trim($_POST['retdate']);
-    
-    if (empty($take_date)) {
-        echo "<script>alert('Please select a take date.'); window.history.back();</script>";
-        exit;
-    }
-    $sql = "INSERT INTO bookings(Book_id, Book_name, Take_date, Return_date, Status) 
-            VALUES ('$book_id', '$book_name', '$take_date', '$ret_date', 'Pending')";
-
-        if (mysqli_query($con, $sql)) {
-            exit;
-        } else {
-            echo "<script>alert('Error: " . mysqli_error($con) . "'); window.history.back();</script>";
-            exit;
-        }
-    }
-mysqli_close($con);
-?>
-
 </html>

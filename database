@@ -1,59 +1,48 @@
-create table Books (
-    id int primary key,
-    Title varchar(100),
-    Author varchar(20),
-    Category varchar(20),
-    Available varchar(5) default="Yes"
-)
-
-create table Users (
-    Memebership_id int primary key,
-    username varchar(20),
-    password  varchar(20),
-    role varchar(10) default="user"
-)
-
-CREATE TABLE `library`.`bookings` (`Booking_id` INT(5) NOT NULL , `Book_id` INT(5) NOT NULL , `BBook_name` VARCHAR(50) NOT NULL , `Take_date` DATE NOT NULL , `Return_date` DATE NOT NULL , `Status` VARCHAR(50) NOT NULL DEFAULT 'Pending' , PRIMARY KEY (`Booking_id`)) ENGINE = InnoDB;
-
-
-PHP EXPORT SCRIPT
-
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
 CREATE TABLE `bookings` (
   `Booking_id` int(5) NOT NULL,
+  `user_id` int(5) NOT NULL,
   `Book_id` int(5) NOT NULL,
   `Book_name` varchar(50) NOT NULL,
   `Take_date` date NOT NULL,
   `Return_date` date NOT NULL,
   `Status` varchar(50) NOT NULL DEFAULT 'Pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `books` (
   `ID` int(5) NOT NULL,
-  `Title` varchar(80) NOT NULL,
-  `Author` varchar(50) NOT NULL,
-  `Category` varchar(15) NOT NULL,
+  `Title` varchar(20) NOT NULL,
+  `Author` varchar(20) NOT NULL,
+  `Category` varchar(20) NOT NULL,
   `Available` varchar(5) NOT NULL DEFAULT 'Yes'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `books` (`ID`, `Title`, `Author`, `Category`, `Available`) VALUES
-(1, 'A Mere Interlude', 'Thomas Hardy', 'Romance', 'Yes'),
-(2, 'An Occurrence at Owl Creek Bridge One of the Missing', 'Ambrose Bierce', 'Adventure', 'Yes');
+(1, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Romance', 'Yes'),
+(2, 'To Kill a Mockingbir', 'Harper Lee', 'Thriller', 'Yes'),
+(3, '1984', 'George Orwell', 'Science Fiction', 'Yes'),
+(4, 'The Hobbit', 'J.R.R. Tolkien', 'Adventure', 'Yes'),
+(5, 'Pride and Prejudice', 'Jane Austen', 'Romance', 'Yes'),
+(6, 'Moby-Dick', 'Herman Melville', 'Adventure', 'Yes'),
+(7, 'War and Peace', 'Leo Tolstoy', 'Action', 'Yes'),
+(8, 'The Catcher in the R', 'J.D. Salinger', 'Thriller', 'Yes'),
+(9, 'Dracula', 'Bram Stoker', 'Horror', 'Yes'),
+(10, 'The Martian', 'Andy Weir', 'Science Fiction', 'Yes');
 
 CREATE TABLE `users` (
   `Membership_id` int(11) NOT NULL,
   `username` varchar(20) NOT NULL,
   `password` varchar(20) NOT NULL,
-  `role` varchar(10) NOT NULL DEFAULT 'user'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `role` varchar(10) DEFAULT 'user'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `users` (`Membership_id`, `username`, `password`, `role`) VALUES
-(1, 'Akash', 'akash', 'user'),
-(2, 'admin', 'admin', 'admin');
+(1, 'admin', 'admin', 'admin'),
+(2, 'Akash', 'akash', 'user');
 
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`Booking_id`);
@@ -63,4 +52,14 @@ ALTER TABLE `books`
 
 ALTER TABLE `users`
   ADD PRIMARY KEY (`Membership_id`);
+
+ALTER TABLE `bookings`
+  MODIFY `Booking_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+ALTER TABLE `users`
+  MODIFY `Membership_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+ALTER TABLE `books`
+  MODIFY `ID` int(5) NOT NULL AUTO_INCREMENT;
+
 COMMIT;

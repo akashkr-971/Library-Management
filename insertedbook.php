@@ -26,8 +26,15 @@
             color: black;
         }
         .displaybooks{
-            margin-top: 20px;
-            overflow: scroll;
+            margin-top: 80px;
+            width: 80%;
+            max-width: 1000px;
+            background-color: rgb(52, 73, 94);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: auto;
+            max-height:500px;
         }
         .displaybooks::-webkit-scrollbar {
             width: 0px;
@@ -36,35 +43,80 @@
             border: 10px solid red;
             padding: 20px;
         }
-        input{
+        input[type="text"] {
+            width: 75%;
+            padding: 10px;
+            font-size: 16px;
             border-radius: 5px;
             border: 1px solid #ccc;
-            padding:8px;
-            font-size:16px;
+            background-color: #fff;
+            color: #333;
         }
-        input:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-        input[type='text']{
-            width: 93%;
-            padding: 5px;
-            margin-bottom: 5px;
-        }
-        input[type='submit']{
-            width: 24%;
-            padding: 5px;
-            margin-bottom: 5px;
-        }
-        input[type='search']{
-            width: 75%;
-            padding: 5px;
-            margin-bottom: 5px;
+
+        input[type="submit"] {
+            width: 20%;
+            padding: 10px;
             font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #36f213;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #28a745;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: rgb(36, 242, 132);
+            color: black;
+        }
+
+        td {
+            background-color: #f8f9fa;
+            color: black;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f1f1f1;
+        }
+
+        tr:nth-child(odd) td {
+            background-color: #ffffff;
         }
         a{
             text-decoration: none;
             color:black;
+        }
+        @media (max-width: 768px) {
+            .displaybookings {
+                width: 95%;
+                margin-top: 20px;
+            }
+            input[type="text"], input[type="submit"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -114,11 +166,12 @@
         <a href="Books.php"><h1>Library Management System</h1></a>
         <a href="Registeruser.php"><h4>Register User</h4></a>
         <a href="Books.php"><h4>Return Home</h4></a>
+        <a href="adminbooking.php"><h4>Bookings</h4></a>
         <a href="logout.php"><h1>Logout</h1></a>
     </nav>
     <div class="displaybooks">
         <form action="" method="post">
-            <input type="search" name="bookdetail" placeholder="Enter the detail of book to search">
+            <input type="text" name="bookdetail" placeholder="Enter the detail of book to search">
             <input type="submit" name="searchbook" value="Search Book">
             <table border="1" class="displaytable">
                 <thead>
