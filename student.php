@@ -2,8 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
     <title>Inserted Books</title>
+    <?php
+        session_start();
+        echo "<script>console.log('Session Username: " . $_SESSION['username'] . "');</script>";
+        echo "<script>console.log('Session User ID: " . $_SESSION['user_id'] . "');</script>";
+        if(!isset($_SESSION['username'])){
+            header("Location:login.php");
+        }
+
+        $con = mysqli_connect("localhost", "root", "", "library");
+        if (!$con) {
+            die("Connection Failed: " . mysqli_connect_error());
+        }
+
+        $fullresult = null;
+        if (!isset($_POST['searchbook'])) {
+            $sql = "SELECT * FROM books";
+            try {
+                $fullresult = mysqli_query($con, $sql);
+            } catch (Exception $e) {
+                echo $e;
+            }
+        }
+
+        if (isset($_POST['searchbook'])) {
+            $bookdetail = trim($_POST['bookdetail']);
+
+            $sql = "SELECT * FROM books 
+                    WHERE ID = '$bookdetail' 
+                    OR LOWER(Title) LIKE LOWER('%$bookdetail%') 
+                    OR LOWER(Author) LIKE LOWER('%$bookdetail%') 
+                    OR LOWER(Category) LIKE LOWER('%$bookdetail%')
+                    OR LOWER(Available) LIKE LOWER('%$bookdetail%')";
+
+            try {
+                $result = mysqli_query($con, $sql);
+            } catch (Exception $e) {
+                echo $e;
+            }
+        }
+        if (isset($_POST['Take'])) {
+            $user_id = $_SESSION['user_id'];
+            $book_id = trim($_POST['bookid']);
+            $book_name = trim($_POST['bname']);
+            $take_date = trim($_POST['takeDate']);
+            $ret_date = trim($_POST['retdate']);
+            
+            if (empty($take_date)) {
+                echo "<script>alert('Please select a take date.'); window.history.back();</script>";
+                exit;
+            }
+            if (empty($ret_date)) {
+                echo "<script>alert('Please reselect the take date.'); window.history.back();</script>";
+                exit;
+            }
+            $sql = "INSERT INTO bookings(user_id,Book_id, Book_name, Take_date, Return_date, Status) 
+                    VALUES ('$user_id','$book_id', '$book_name', '$take_date', '$ret_date', 'Pending')";
+            $sql1 = "UPDATE BOOKS SET AVAILABLE = 'No' WHERE id = '$book_id'; ";
+        
+            if (mysqli_query($con, $sql)) {
+                if(mysqli_query($con, $sql1)){
+                    echo "<script>
+                        alert('Book taking request sent');
+                        window.history.back();
+                        document.getElementById('takeDate').value = ''; 
+                    </script>";
+                exit;
+                }
+                else{
+                    echo "<script>alert('Update error: " . mysqli_error($con) . "'); window.history.back();</script>";
+                }
+            } else {
+                echo "<script>alert('Error: " . mysqli_error($con) . "'); window.history.back();</script>";
+                exit;
+            }
+            
+        }
+    ?>
     <style>
         body {
             background-color: rgb(31, 49, 20);
@@ -34,16 +111,23 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            overflow: auto;
-            max-height:500px;
+            max-height:600px;
         }
-        .displaybooks::-webkit-scrollbar {
+        .bookdetails::-webkit-scrollbar {
             width: 0px;
         }
         .bookdetails {
             border: 10px solid red;
             padding: 20px;
+            height:90%;
+            overflow:scroll;
         }
+
+        .displaytable{
+            width:99%;
+            max-height:500px;
+        }
+
         input{
             border-radius: 5px;
             border: 1px solid #ccc;
@@ -73,9 +157,6 @@
         a{
             text-decoration: none;
             color:black;
-        }
-        table{
-            width:100%;
         }
         .action{
             width:100% !important;
@@ -149,86 +230,28 @@
             z-index:1;
             opacity: 0.3;
         }
+        @media screen and (max-width: 820px) {
+            body {
+                font-size: 12px;
+            }
+            table {
+                width: 100%; 
+                border-collapse: collapse;
+            }
+            .displaytable {
+                overflow-x: scroll;
+            }
+            th, td {
+                padding: 8px; 
+                font-size: 10px; 
+                width:10px;
+                word-wrap: break-word;
+            }
+        }
     </style>
 </head>
 
-<?php
-    session_start();
-    echo "<script>console.log('Session Username: " . $_SESSION['username'] . "');</script>";
-    echo "<script>console.log('Session User ID: " . $_SESSION['user_id'] . "');</script>";
-    if(!isset($_SESSION['username'])){
-        header("Location:login.php");
-    }
 
-    $con = mysqli_connect("localhost", "root", "", "library");
-    if (!$con) {
-        die("Connection Failed: " . mysqli_connect_error());
-    }
-
-    $fullresult = null;
-    if (!isset($_POST['searchbook'])) {
-        $sql = "SELECT * FROM books";
-        try {
-            $fullresult = mysqli_query($con, $sql);
-        } catch (Exception $e) {
-            echo $e;
-        }
-    }
-
-    if (isset($_POST['searchbook'])) {
-        $bookdetail = trim($_POST['bookdetail']);
-
-        $sql = "SELECT * FROM books 
-                WHERE ID = '$bookdetail' 
-                OR LOWER(Title) LIKE LOWER('%$bookdetail%') 
-                OR LOWER(Author) LIKE LOWER('%$bookdetail%') 
-                OR LOWER(Category) LIKE LOWER('%$bookdetail%')
-                OR LOWER(Available) LIKE LOWER('%$bookdetail%')";
-
-        try {
-            $result = mysqli_query($con, $sql);
-        } catch (Exception $e) {
-            echo $e;
-        }
-    }
-    if (isset($_POST['Take'])) {
-        $user_id = $_SESSION['user_id'];
-        $book_id = trim($_POST['bookid']);
-        $book_name = trim($_POST['bname']);
-        $take_date = trim($_POST['takeDate']);
-        $ret_date = trim($_POST['retdate']);
-        
-        if (empty($take_date)) {
-            echo "<script>alert('Please select a take date.'); window.history.back();</script>";
-            exit;
-        }
-        if (empty($ret_date)) {
-            echo "<script>alert('Please reselect the take date.'); window.history.back();</script>";
-            exit;
-        }
-        $sql = "INSERT INTO bookings(user_id,Book_id, Book_name, Take_date, Return_date, Status) 
-                VALUES ('$user_id','$book_id', '$book_name', '$take_date', '$ret_date', 'Pending')";
-        $sql1 = "UPDATE BOOKS SET AVAILABLE = 'No' WHERE id = '$book_id'; ";
-    
-        if (mysqli_query($con, $sql)) {
-            if(mysqli_query($con, $sql1)){
-                echo "<script>
-                    alert('Book taking request sent');
-                    window.history.back();
-                    document.getElementById('takeDate').value = ''; 
-                </script>";
-            exit;
-            }
-            else{
-                echo "<script>alert('Update error: " . mysqli_error($con) . "'); window.history.back();</script>";
-            }
-        } else {
-            echo "<script>alert('Error: " . mysqli_error($con) . "'); window.history.back();</script>";
-            exit;
-        }
-        
-    }
-?>
 <body>
     <div id="overlay" style="display:none"></div>
     <nav>

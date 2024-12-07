@@ -80,13 +80,65 @@
     if(!isset($_SESSION['username'])){
         header("Location:login.php");
     }
-    $con = mysqli_connect("localhost","root","","library");
-    $sql1="SELECT MAX(id) FROM books";
-    $lastbookid = mysqli_query($con, $sql1);
-    $row = mysqli_fetch_assoc($lastbookid);
-    $lastbookidno = $row['id'];
-    echo "<script>console.log($lastbookidno)</script>";
-    mysqli_close($con);
+    if(isset($_POST['insert']))
+    {
+        $bid = $_POST['bid'];
+        $bname = $_POST['bname'];
+        $aname = $_POST['aname'];
+        $category = $_POST['category'];
+        $con = mysqli_connect("localhost","root","","library");
+        if(!$con)
+            die("Connection Failed ".mysqli_connect_error());
+        $sql="insert into books (ID, Title, Author, Category) values ('$bid','$bname','$aname','$category')";
+        try{
+            mysqli_query($con,$sql);
+            echo "<script>alert('Book Inserted Successfully!!');
+            window.location.href = 'books.php';
+            </script>";
+        }
+        catch(Exception $e)
+        {
+        echo "</br></br> Enter the values in textbox to  insert";
+        echo $e;
+        }
+        mysqli_close($con);
+    }
+    if(isset($_POST['update']))
+    {
+        $ubid = $_POST['bid'];
+        $ubname = $_POST['bname'];
+        $uaname = $_POST['aname'];
+        $ucategory = $_POST['category'];
+        $ucon = mysqli_connect("localhost", "root", "", "library");
+        if(!$ucon)
+            die("Connection Failed " . mysqli_connect_error());
+        $usql = "UPDATE books SET Title='$ubname', Author='$uaname', Category='$ucategory' WHERE ID='$ubid'";
+        if (mysqli_query($ucon, $usql)) {
+            echo "<script>alert('Book Updated Successfully!!');
+            window.location.href = 'books.php';
+            </script>";
+        } else {
+            echo "<br>Update Failed!!!";
+        }
+        mysqli_close($ucon);
+    }
+
+    if(isset($_POST['delete']))
+    {
+        $dbid = $_POST['bid'];
+        $dcon = mysqli_connect("localhost", "root", "", "library");
+        if(!$dcon)
+            die("Connection Failed " . mysqli_connect_error());
+        $dsql = "DELETE FROM books WHERE ID='$dbid'";
+        if (mysqli_query($dcon, $dsql)) {
+            echo "<script>alert('Book Deleted Successfully!!');
+            window.location.href = 'books.php';
+            </script>";
+            } else {
+            echo "<br>Deletion Failed!!!";
+        }
+        mysqli_close($dcon);
+    }
 ?>
 
 <body>
@@ -109,7 +161,7 @@
                 <tr></tr>
                 <tr>
                     <td colspan="2"><label for="">Book ID </label></td>
-                    <td colspan="2"><input type="text" name="bid"></td>
+                    <td colspan="2"><input type="text" name="bid" id="bid"></td>
                 </tr>
                 <tr>
                     <td colspan="2"><label for="">Book Name </label></td>
@@ -156,56 +208,17 @@
 </html>
 
 <?php
-if(isset($_POST['insert']))
-{
-    $bid = $_POST['bid'];
-    $bname = $_POST['bname'];
-    $aname = $_POST['aname'];
-    $category = $_POST['category'];
     $con = mysqli_connect("localhost","root","","library");
-    if(!$con)
-        die("Connection Failed ".mysqli_connect_error());
-    $sql="insert into books (ID, Title, Author, Category) values ('$bid','$bname','$aname','$category')";
-    try{
-        mysqli_query($con,$sql);
-    }
-    catch(Exception $e)
-    {
-    echo "</br></br> Enter the values in textbox to  insert";
-    echo $e;
+    $sql1="SELECT MAX(id) AS max_id FROM books";
+    $lastbookid = mysqli_query($con, $sql1);
+    if ($lastbookid) {
+        $row = mysqli_fetch_assoc($lastbookid);
+        $lastbookidno = $row['max_id'];
+        echo "<script>
+               document.getElementById('bid').value=$lastbookidno+1;
+            </script>";
+    } else {
+        echo "Error: " . mysqli_error($con);
     }
     mysqli_close($con);
-}
-if(isset($_POST['update']))
-{
-    $ubid = $_POST['bid'];
-    $ubname = $_POST['bname'];
-    $uaname = $_POST['aname'];
-    $ucategory = $_POST['category'];
-    $ucon = mysqli_connect("localhost", "root", "", "library");
-    if(!$ucon)
-        die("Connection Failed " . mysqli_connect_error());
-    $usql = "UPDATE books SET Title='$ubname', Author='$uaname', Category='$ucategory' WHERE ID='$ubid'";
-    if (mysqli_query($ucon, $usql)) {
-        echo "<br><br><br>Updated Successfully!!!";
-    } else {
-        echo "<br>Update Failed!!!";
-    }
-    mysqli_close($ucon);
-}
-
-if(isset($_POST['delete']))
-{
-    $dbid = $_POST['bid'];
-    $dcon = mysqli_connect("localhost", "root", "", "library");
-    if(!$dcon)
-        die("Connection Failed " . mysqli_connect_error());
-    $dsql = "DELETE FROM books WHERE ID='$dbid'";
-    if (mysqli_query($dcon, $dsql)) {
-        echo "<br><br><br>Deleted Successfully!!!";
-    } else {
-        echo "<br>Deletion Failed!!!";
-    }
-    mysqli_close($dcon);
-}
 ?>

@@ -177,9 +177,12 @@
     }
     if (isset($_POST['cancel'])) {
         $bookngid = $_POST['bkngid'];
+        $$bkid = $_POST['bkid']; 
         echo "<script>console.log('$bookngid')</script>";
         $sql = "UPDATE bookings SET Status = 'Cancelled' WHERE Booking_id = '$bookngid'";
+        $sql1 = "UPDATE books SET Availability = 'Yes' WHERE id='$bkid'";
         mysqli_query($con, $sql);
+        mysqli_query($con, $sql1);
         header("Location: Bookings.php");
     }
 ?>
@@ -219,7 +222,8 @@
                             echo "<td>" .$row['Status'] . "</td>";
                             echo "<form action='' method='post'>";
                             echo "<input type='hidden' name='bkngid' value='" . $row['Booking_id'] . "'>";
-                            
+                            echo "<input type='hidden' name='bkid' value='" . $row['Book_id'] . "'>";
+
                             if ($row['Status'] == "Pending") {
                                 echo "<td><input type='submit' name='cancel' value='Cancel'></td>";
                             } elseif ($row['Status'] == "Accepted") {

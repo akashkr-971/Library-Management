@@ -4,6 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inserted Books</title>
+    <?php
+        session_start();
+        echo "<script>console.log('Session Username: " . $_SESSION['username'] . "');</script>";
+        echo "<script>console.log('Session User ID: " . $_SESSION['user_id'] . "');</script>";
+        if(!isset($_SESSION['username'])){
+            header("Location:login.php");
+        }
+
+        $con = mysqli_connect("localhost", "root", "", "library");
+        if (!$con) {
+            die("Connection Failed: " . mysqli_connect_error());
+        }
+
+        $fullresult = null;
+        if (!isset($_POST['searchbook'])) {
+            $sql = "SELECT * FROM books";
+            try {
+                $fullresult = mysqli_query($con, $sql);
+            } catch (Exception $e) {
+                echo $e;
+            }
+        }
+
+        if (isset($_POST['searchbook'])) {
+            $bookdetail = trim($_POST['bookdetail']);
+
+            $sql = "SELECT * FROM books 
+                    WHERE ID = '$bookdetail' 
+                    OR LOWER(Title) LIKE LOWER('%$bookdetail%') 
+                    OR LOWER(Author) LIKE LOWER('%$bookdetail%') 
+                    OR LOWER(Category) LIKE LOWER('%$bookdetail%')
+                    OR LOWER(Available) LIKE LOWER('%$bookdetail%')";
+
+            try {
+                $result = mysqli_query($con, $sql);
+            } catch (Exception $e) {
+                echo $e;
+            }
+        }
+    ?>
     <style>
         body {
             background-color: rgb(31, 49, 20);
@@ -120,47 +160,6 @@
         }
     </style>
 </head>
-
-<?php
-    session_start();
-    echo "<script>console.log('Session Username: " . $_SESSION['username'] . "');</script>";
-    echo "<script>console.log('Session User ID: " . $_SESSION['user_id'] . "');</script>";
-    if(!isset($_SESSION['username'])){
-        header("Location:login.php");
-    }
-
-    $con = mysqli_connect("localhost", "root", "", "library");
-    if (!$con) {
-        die("Connection Failed: " . mysqli_connect_error());
-    }
-
-    $fullresult = null;
-    if (!isset($_POST['searchbook'])) {
-        $sql = "SELECT * FROM books";
-        try {
-            $fullresult = mysqli_query($con, $sql);
-        } catch (Exception $e) {
-            echo $e;
-        }
-    }
-
-    if (isset($_POST['searchbook'])) {
-        $bookdetail = trim($_POST['bookdetail']);
-
-        $sql = "SELECT * FROM books 
-                WHERE ID = '$bookdetail' 
-                OR LOWER(Title) LIKE LOWER('%$bookdetail%') 
-                OR LOWER(Author) LIKE LOWER('%$bookdetail%') 
-                OR LOWER(Category) LIKE LOWER('%$bookdetail%')
-                OR LOWER(Available) LIKE LOWER('%$bookdetail%')";
-
-        try {
-            $result = mysqli_query($con, $sql);
-        } catch (Exception $e) {
-            echo $e;
-        }
-    }
-?>
 <body>
     <nav>
         <a href="Books.php"><h1>Library Management System</h1></a>
